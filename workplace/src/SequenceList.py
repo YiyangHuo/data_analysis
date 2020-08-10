@@ -2,6 +2,7 @@ import csv
 import os
 import numpy as np
 from plot.plotfuncs import plot_scatter
+from dtw import *
 COLOUMN_SIZE = 4
 LABEL_NUM = 7
 X_ACC_INDEX = 0
@@ -33,7 +34,31 @@ class SequenceList(object):
                 current_sequences = []
                 current_sequences.append(file_data[index])
         print(self._sequences[0][1]) # use for test
+    
+    def getNearestLabel(self, target_query):
+        output = []
+        for index in range(len(self._sequences)):
+            total_distance = 0
+            for template_sequence in self._sequences[index]:
+                alignment = dtw(target_query, template_sequence,dist_method='euclidean', keep_internals=True)
+                total_distance += alignment.normalizedDistance
+            avg_distance = total_distance / len(self._sequences)
+            output.append(avg_distance)
+        return list.index(min(output))
         
 sequence1 = SequenceList()
 sequence1.addData('../data/test.csv')
+targetquery = [
+[1502,2215,2153],
+[1667,2072,2047],
+[1611,1957,1906],
+[1601,1939,1831],
+[1643,1965,1879],
+[1604,1959,1921],
+[1640,1829,1940],
+[1607,1910,1910],
+[1546,2045,1910],
+[1529,2049,1972],
+]
+print(sequence1.getNearestLabel(targetquery))
 
