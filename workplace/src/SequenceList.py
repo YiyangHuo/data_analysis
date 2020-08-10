@@ -18,7 +18,6 @@ class SequenceList(object):
         file_data = np.genfromtxt(file_name,delimiter=",",dtype=None, invalid_raise=False)
         file_data = np.delete(file_data, 0, 1)
         row_size = file_data.shape[0]
-        print(row_size)
         current_label = file_data[0][LABEL_INDEX]
         current_sequences = []
         for index in range(row_size):
@@ -33,18 +32,22 @@ class SequenceList(object):
                 current_label = file_data[index][LABEL_INDEX]
                 current_sequences = []
                 current_sequences.append(file_data[index])
-        print(self._sequences[0][1]) # use for test
     
     def getNearestLabel(self, target_query):
         output = []
         for index in range(len(self._sequences)):
             total_distance = 0
+            if len(self._sequences[index]) == 0:
+                continue
             for template_sequence in self._sequences[index]:
+                template_sequence = np.delete(template_sequence, LABEL_INDEX, 1)
                 alignment = dtw(target_query, template_sequence,dist_method='euclidean', keep_internals=True)
                 total_distance += alignment.normalizedDistance
-            avg_distance = total_distance / len(self._sequences)
+                print(total_distance)
+            avg_distance = total_distance / len(self._sequences[index])
             output.append(avg_distance)
-        return list.index(min(output))
+        print(output)
+        return output.index(min(output))
         
 sequence1 = SequenceList()
 sequence1.addData('../data/test.csv')
